@@ -1,6 +1,8 @@
 import { test as base } from '@playwright/test';
 import { PostsApi } from '../api/PostsApi';
+import { CartPage } from '../pages/demoblaze/CartPage';
 import { LoginPage } from '../pages/demoblaze/LoginPage';
+import { ProductPage } from '../pages/demoblaze/ProductPage';
 import { SignUpPage } from '../pages/demoblaze/SignUpPage';
 import { StorePage } from '../pages/demoblaze/StorePage';
 import { HomePage } from '../pages/HomePage';
@@ -13,6 +15,8 @@ type PageFixtures = {
   storePage: StorePage;
   loginPage: LoginPage;
   signUpPage: SignUpPage;
+  productPage: ProductPage;
+  cartPage: CartPage;
 };
 
 export const test = base.extend<PageFixtures>({
@@ -33,6 +37,12 @@ export const test = base.extend<PageFixtures>({
   },
   signUpPage: async ({ page }, use) => {
     await use(new SignUpPage(page));
+  },
+  productPage: async ({ page }, use) => {
+    await use(new ProductPage(page));
+  },
+  cartPage: async ({ page }, use) => {
+    await use(new CartPage(page));
   },
 });
 

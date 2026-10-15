@@ -1,6 +1,6 @@
 import { test, expect } from '../../fixtures/test';
 
-test('returns an existing post', async ({ postsApi }) => {
+test('returns an existing post', { tag: '@smoke' }, async ({ postsApi }) => {
   const response = await postsApi.getPost(1);
 
   expect(response.status()).toBe(200);

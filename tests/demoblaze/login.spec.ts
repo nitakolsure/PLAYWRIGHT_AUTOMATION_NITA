@@ -1,12 +1,12 @@
+import { environment } from '../../config/environment';
+import { invalidStoreLogin, newStoreUser } from '../../data/storeUser';
 import { test, expect } from '../../fixtures/test';
 
-test.use({ baseURL: 'https://www.demoblaze.com' });
+test.use({ baseURL: environment.storeBaseURL });
 test.setTimeout(60_000);
 
-const password = 'Pass1234';
-
-test('logs in with a new account', async ({ storePage, signUpPage, loginPage }) => {
-  const username = `pwuser${Date.now()}`;
+test('logs in with a new account', { tag: '@smoke' }, async ({ storePage, signUpPage, loginPage }) => {
+  const { username, password } = newStoreUser();
 
   await storePage.goto();
 
@@ -23,7 +23,7 @@ test('logs in with a new account', async ({ storePage, signUpPage, loginPage }) 
 test('rejects a wrong password', async ({ storePage, loginPage }) => {
   await storePage.goto();
 
-  const loginMessage = await loginPage.login('pwuser', 'wrong-password');
+  const loginMessage = await loginPage.login(invalidStoreLogin.username, invalidStoreLogin.password);
   expect(loginMessage).toMatch(/Wrong password|User does not exist/);
   await storePage.expectLoggedOut();
 });

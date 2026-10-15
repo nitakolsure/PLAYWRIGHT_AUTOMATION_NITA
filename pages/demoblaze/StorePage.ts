@@ -15,6 +15,12 @@ export class StorePage {
     await this.page.goto('/');
   }
 
+  async openProduct(category: 'Phones' | 'Laptops' | 'Monitors', productName: string) {
+    await this.page.getByRole('link', { name: category, exact: true }).click();
+    await this.page.getByRole('link', { name: productName, exact: true }).click();
+    await expect(this.page).toHaveURL(/prod\.html/);
+  }
+
   async expectLoggedInAs(username: string) {
     await expect(this.welcome).toHaveText(`Welcome ${username}`, { timeout: 15000 });
   }

@@ -1,6 +1,6 @@
 import { test } from '../fixtures/test';
 
-test('has title', async ({ homePage }) => {
+test('has title', { tag: '@smoke' }, async ({ homePage }) => {
   await homePage.goto();
   await homePage.expectTitle();
 });
