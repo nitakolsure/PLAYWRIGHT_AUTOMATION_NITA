@@ -1,3 +1,4 @@
+/** Checks the JSONPlaceholder posts contract. */
 import { test, expect } from '../../fixtures/test';
 
 test('returns an existing post', { tag: '@smoke' }, async ({ postsApi }) => {
@@ -7,13 +8,17 @@ test('returns an existing post', { tag: '@smoke' }, async ({ postsApi }) => {
   expect(response.ok()).toBeTruthy();
 
   const post = await response.json();
-  expect(post.id).toBe(1);
-  expect(post.userId).toBe(1);
-  expect(post.title).toEqual(expect.any(String));
-  expect(post.body).toEqual(expect.any(String));
+  expect(post).toEqual(
+    expect.objectContaining({
+      id: 1,
+      userId: 1,
+      title: expect.any(String),
+      body: expect.any(String),
+    }),
+  );
 });
 
-test('lists posts for one user', async ({ postsApi }) => {
+test('lists posts for one user', { tag: '@regression' }, async ({ postsApi }) => {
   const response = await postsApi.listPostsByUser(1);
 
   expect(response.status()).toBe(200);
@@ -21,11 +26,18 @@ test('lists posts for one user', async ({ postsApi }) => {
   const posts = await response.json();
   expect(posts.length).toBeGreaterThan(0);
   for (const post of posts) {
-    expect(post.userId).toBe(1);
+    expect(post).toEqual(
+      expect.objectContaining({
+        userId: 1,
+        id: expect.any(Number),
+        title: expect.any(String),
+        body: expect.any(String),
+      }),
+    );
   }
 });
 
-test('creates a post', async ({ postsApi }) => {
+test('creates a post', { tag: '@regression' }, async ({ postsApi }) => {
   const newPost = {
     title: 'API testing',
     body: 'Send a request and check the response.',
@@ -41,7 +53,7 @@ test('creates a post', async ({ postsApi }) => {
   expect(created.id).toEqual(expect.any(Number));
 });
 
-test('returns 404 when the post does not exist', async ({ postsApi }) => {
+test('returns 404 when the post does not exist', { tag: '@regression' }, async ({ postsApi }) => {
   const response = await postsApi.getPost(0);
 
   expect(response.status()).toBe(404);

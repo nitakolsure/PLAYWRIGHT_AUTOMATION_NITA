@@ -1,6 +1,9 @@
+import { randomBytes } from 'crypto';
+
 export function newStoreUser() {
+  const suffix = `${Date.now()}${randomBytes(3).toString('hex')}`;
   return {
-    username: `pwuser${Date.now()}`,
+    username: `pwuser${suffix}`,
     password: process.env.STORE_PASSWORD ?? 'Pass1234',
   };
 }

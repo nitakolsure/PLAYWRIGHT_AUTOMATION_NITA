@@ -1,7 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 import { environment } from './config/environment';
+import { authStatePath } from './config/paths';
 
 const ci = !!process.env.CI;
+const browserTestsToSkip = ['**/api/**', '**/*.setup.ts', '**/order.spec.ts'];
 
 export default defineConfig({
   testDir: './tests',
@@ -19,19 +21,37 @@ export default defineConfig({
   },
   projects: [
     {
+      name: 'setup',
+      testMatch: /auth\.setup\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: environment.storeBaseURL,
+      },
+    },
+    {
       name: 'chromium',
-      testIgnore: '**/api/**',
+      testIgnore: browserTestsToSkip,
       use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'firefox',
-      testIgnore: '**/api/**',
+      testIgnore: browserTestsToSkip,
       use: { ...devices['Desktop Firefox'] },
     },
     {
       name: 'webkit',
-      testIgnore: '**/api/**',
+      testIgnore: browserTestsToSkip,
       use: { ...devices['Desktop Safari'] },
+    },
+    {
+      name: 'store',
+      testMatch: /demoblaze\/order\.spec\.ts/,
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: environment.storeBaseURL,
+        storageState: authStatePath,
+      },
     },
     {
       name: 'api',
