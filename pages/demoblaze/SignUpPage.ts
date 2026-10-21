@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import { acceptNextDialog } from '../../utils/dialog';
 
 export class SignUpPage {
   readonly page: Page;
@@ -19,13 +20,7 @@ export class SignUpPage {
   }
 
   async signUp(username: string, password: string): Promise<string> {
-    const alertMessage = new Promise<string>((resolve) => {
-      this.page.once('dialog', async (dialog) => {
-        const message = dialog.message();
-        await dialog.accept();
-        resolve(message);
-      });
-    });
+    const alertMessage = acceptNextDialog(this.page);
 
     await this.open();
     await this.usernameInput.fill(username);

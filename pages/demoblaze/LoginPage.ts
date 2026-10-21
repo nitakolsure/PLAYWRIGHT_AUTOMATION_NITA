@@ -1,4 +1,5 @@
 import { type Locator, type Page } from '@playwright/test';
+import { acceptNextDialog } from '../../utils/dialog';
 
 export class LoginPage {
   readonly page: Page;
@@ -25,13 +26,7 @@ export class LoginPage {
   }
 
   async login(username: string, password: string): Promise<string | undefined> {
-    const alertMessage = new Promise<string>((resolve) => {
-      this.page.once('dialog', async (dialog) => {
-        const message = dialog.message();
-        await dialog.accept();
-        resolve(message);
-      });
-    });
+    const alertMessage = acceptNextDialog(this.page);
     const loggedIn = this.page
       .locator('#nameofuser')
       .waitFor({ state: 'visible', timeout: 15000 })

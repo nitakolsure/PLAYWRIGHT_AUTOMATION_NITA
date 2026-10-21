@@ -1,6 +1,8 @@
 import { expect, type Page } from '@playwright/test';
 import { environment } from '../../config/environment';
 import { type OrderDetails } from '../../data/order';
+import { acceptNextDialog } from '../../utils/dialog';
+import { waitForStoreApi } from '../../utils/storeApi';
 
 export class CartPage {
   readonly page: Page;
@@ -24,10 +26,7 @@ export class CartPage {
     }
 
     if (!this.page.url().includes('cart.html')) {
-      const cartLoaded = this.page.waitForResponse(
-        (response) => response.url().includes('/viewcart') && response.ok(),
-        { timeout: 15000 },
-      );
+      const cartLoaded = waitForStoreApi(this.page, '/viewcart');
       await this.page.getByRole('link', { name: 'Cart', exact: true }).click();
       await cartLoaded;
     }
@@ -40,10 +39,7 @@ export class CartPage {
     const rows = this.page.locator('#tbodyid tr');
 
     for (let attempt = 0; attempt < 5 && (await rows.count()) > 0; attempt++) {
-      const deleted = this.page.waitForResponse(
-        (response) => response.url().includes('/deleteitem') && response.ok(),
-        { timeout: 15000 },
-      );
+      const deleted = waitForStoreApi(this.page, '/deleteitem');
       await rows.first().getByRole('link', { name: 'Delete' }).click();
       await deleted;
     }
@@ -61,10 +57,7 @@ export class CartPage {
 
   async removeProduct(productName: string) {
     const row = this.page.locator('#tbodyid tr', { hasText: productName });
-    const deleted = this.page.waitForResponse(
-      (response) => response.url().includes('/deleteitem') && response.ok(),
-      { timeout: 15000 },
-    );
+    const deleted = waitForStoreApi(this.page, '/deleteitem');
     await row.getByRole('link', { name: 'Delete' }).click();
     await deleted;
     await this.expectProductAbsent(productName);
@@ -74,13 +67,7 @@ export class CartPage {
     await this.page.getByRole('button', { name: 'Place Order' }).click();
     await expect(this.page.locator('#orderModal')).toBeVisible();
 
-    const message = new Promise<string>((resolve) => {
-      this.page.once('dialog', async (dialog) => {
-        const text = dialog.message();
-        await dialog.accept();
-        resolve(text);
-      });
-    });
+    const message = acceptNextDialog(this.page);
 
     await this.page.getByRole('button', { name: 'Purchase' }).click();
     return message;

@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import { waitForStoreApi } from '../../utils/storeApi';
 
 export class StorePage {
   readonly page: Page;
@@ -16,10 +17,7 @@ export class StorePage {
   }
 
   async openProduct(category: 'Phones' | 'Laptops' | 'Monitors', productName: string) {
-    const catalogLoaded = this.page.waitForResponse(
-      (response) => response.url().includes('/bycat') && response.ok(),
-      { timeout: 15000 },
-    );
+    const catalogLoaded = waitForStoreApi(this.page, '/bycat');
     await this.page.getByRole('link', { name: category, exact: true }).click();
     await catalogLoaded;
     await this.page.getByRole('link', { name: productName, exact: true }).click();

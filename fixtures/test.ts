@@ -1,5 +1,6 @@
 import { test as base } from '@playwright/test';
 import { PostsApi } from '../api/PostsApi';
+import { UsersApi } from '../api/UsersApi';
 import { CartPage } from '../pages/demoblaze/CartPage';
 import { LoginPage } from '../pages/demoblaze/LoginPage';
 import { ProductPage } from '../pages/demoblaze/ProductPage';
@@ -12,6 +13,7 @@ type PageFixtures = {
   homePage: HomePage;
   installationPage: InstallationPage;
   postsApi: PostsApi;
+  usersApi: UsersApi;
   storePage: StorePage;
   loginPage: LoginPage;
   signUpPage: SignUpPage;
@@ -28,6 +30,9 @@ export const test = base.extend<PageFixtures>({
   },
   postsApi: async ({ request }, use) => {
     await use(new PostsApi(request));
+  },
+  usersApi: async ({ request }, use) => {
+    await use(new UsersApi(request));
   },
   storePage: async ({ page }, use) => {
     await use(new StorePage(page));
