@@ -61,7 +61,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report-smoke
-          path: playwright-report/
+          path: |
+            playwright-report/
+            test-results/junit.xml
           retention-days: 14
 
   test:
@@ -104,5 +106,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report-${{ matrix.project }}
-          path: playwright-report/
+          path: |
+            playwright-report/
+            test-results/junit.xml
           retention-days: 14

@@ -1,19 +1,15 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import { BasePage } from '../../core/BasePage';
 import { waitForStoreApi } from '../../utils/storeApi';
 
-export class StorePage {
-  readonly page: Page;
+export class StorePage extends BasePage {
   readonly welcome: Locator;
   readonly logoutLink: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.welcome = page.locator('#nameofuser');
     this.logoutLink = page.getByRole('link', { name: 'Log out' });
-  }
-
-  async goto() {
-    await this.page.goto('/');
   }
 
   async openProduct(category: 'Phones' | 'Laptops' | 'Monitors', productName: string) {

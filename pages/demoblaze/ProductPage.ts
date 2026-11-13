@@ -1,11 +1,10 @@
 import { type Page } from '@playwright/test';
+import { BasePage } from '../../core/BasePage';
 import { acceptNextDialog } from '../../utils/dialog';
 
-export class ProductPage {
-  readonly page: Page;
-
+export class ProductPage extends BasePage {
   constructor(page: Page) {
-    this.page = page;
+    super(page);
   }
 
   async addToCart(): Promise<string> {

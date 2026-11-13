@@ -1,14 +1,14 @@
 import { type Locator, type Page } from '@playwright/test';
+import { BasePage } from '../../core/BasePage';
 import { acceptNextDialog } from '../../utils/dialog';
 
-export class LoginPage {
-  readonly page: Page;
+export class LoginPage extends BasePage {
   readonly usernameInput: Locator;
   readonly passwordInput: Locator;
   readonly submitButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.usernameInput = page.locator('#loginusername');
     this.passwordInput = page.locator('#loginpassword');
     this.submitButton = page.locator('#logInModal').getByRole('button', { name: 'Log in' });

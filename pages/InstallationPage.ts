@@ -1,11 +1,11 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import { BasePage } from '../core/BasePage';
 
-export class InstallationPage {
-  readonly page: Page;
+export class InstallationPage extends BasePage {
   readonly heading: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.heading = page.getByRole('heading', { name: 'Installation' });
   }
 

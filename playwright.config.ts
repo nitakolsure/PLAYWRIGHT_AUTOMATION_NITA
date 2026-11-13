@@ -11,8 +11,17 @@ export default defineConfig({
   forbidOnly: ci,
   retries: ci ? 2 : 0,
   reporter: ci
-    ? [['github'], ['html', { open: 'never' }], ['list']]
-    : [['html', { open: 'never' }], ['list']],
+    ? [
+        ['github'],
+        ['html', { open: 'never' }],
+        ['junit', { outputFile: 'test-results/junit.xml' }],
+        ['list'],
+      ]
+    : [
+        ['html', { open: 'never' }],
+        ['junit', { outputFile: 'test-results/junit.xml' }],
+        ['list'],
+      ],
   use: {
     baseURL: environment.webBaseURL,
     trace: 'on-first-retry',

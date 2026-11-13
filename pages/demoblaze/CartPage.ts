@@ -1,14 +1,17 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { environment } from '../../config/environment';
+import { BasePage } from '../../core/BasePage';
 import { type OrderDetails } from '../../data/order';
 import { acceptNextDialog } from '../../utils/dialog';
 import { waitForStoreApi } from '../../utils/storeApi';
 
-export class CartPage {
-  readonly page: Page;
-
+export class CartPage extends BasePage {
   constructor(page: Page) {
-    this.page = page;
+    super(page);
+  }
+
+  private productRows(productName: string): Locator {
+    return this.page.locator('#tbodyid tr', { hasText: productName });
   }
 
   async dismissConfirmation() {
@@ -38,7 +41,7 @@ export class CartPage {
     await this.open();
     const rows = this.page.locator('#tbodyid tr');
 
-    for (let attempt = 0; attempt < 5 && (await rows.count()) > 0; attempt++) {
+    for (let attempt = 0; attempt < 20 && (await rows.count()) > 0; attempt++) {
       const deleted = waitForStoreApi(this.page, '/deleteitem');
       await rows.first().getByRole('link', { name: 'Delete' }).click();
       await deleted;
@@ -47,16 +50,16 @@ export class CartPage {
     await expect(rows).toHaveCount(0);
   }
 
-  async expectProduct(productName: string) {
-    await expect(this.page.locator('#tbodyid tr', { hasText: productName })).toBeVisible({ timeout: 15000 });
+  async expectProduct(productName: string, count = 1) {
+    await expect(this.productRows(productName)).toHaveCount(count, { timeout: 15000 });
   }
 
   async expectProductAbsent(productName: string) {
-    await expect(this.page.locator('#tbodyid tr', { hasText: productName })).toHaveCount(0);
+    await this.expectProduct(productName, 0);
   }
 
   async removeProduct(productName: string) {
-    const row = this.page.locator('#tbodyid tr', { hasText: productName });
+    const row = this.productRows(productName).first();
     const deleted = waitForStoreApi(this.page, '/deleteitem');
     await row.getByRole('link', { name: 'Delete' }).click();
     await deleted;
