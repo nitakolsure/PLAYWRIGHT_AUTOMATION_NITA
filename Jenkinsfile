@@ -26,6 +26,7 @@ pipeline {
     stage('Test') {
       steps {
         sh 'npx playwright test'
+        sh 'npm run bdd'
       }
     }
   }

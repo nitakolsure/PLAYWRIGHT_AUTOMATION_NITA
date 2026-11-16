@@ -10,6 +10,10 @@
     "test:api": "playwright test --project=api",
     "test:chromium": "playwright test --project=chromium",
     "test:store": "playwright test --project=store",
+    "bdd": "cucumber-js",
+    "bdd:smoke": "cucumber-js -p smoke",
+    "bdd:api": "cucumber-js -p api",
+    "bdd:ui": "cucumber-js -p ui",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "report": "playwright show-report"
@@ -20,7 +24,9 @@
   "type": "commonjs",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@cucumber/cucumber": "^11.3.0",
     "@playwright/test": "^1.64.0",
+    "ts-node": "^10.9.2",
     "@types/node": "^26.6.5",
     "eslint": "^10.12.0",
     "typescript": "^6.0.3",

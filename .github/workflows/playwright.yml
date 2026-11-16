@@ -11,20 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Lint
-        run: npm run lint
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
 
   smoke:
     name: smoke
@@ -34,40 +27,27 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
-
-      - name: Run smoke tests
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Playwright smoke
         run: npx playwright test --grep @smoke --project=chromium --project=api
-
-      - name: Write job summary
-        if: always()
-        run: |
-          echo "### Smoke" >> "$GITHUB_STEP_SUMMARY"
-          echo "Status: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Download the playwright-report-smoke artifact for screenshots and traces." >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Upload report
+      - name: Cucumber smoke
+        run: npm run bdd:smoke
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-smoke
+          name: reports-smoke
           path: |
             playwright-report/
-            test-results/junit.xml
+            reports/
           retention-days: 14
 
   test:
-    name: ${{ matrix.project }}
+    name: ${{ matrix.suite }}
     needs: quality
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -75,38 +55,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [chromium, firefox, webkit, api, store]
+        suite: [playwright, cucumber]
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright browsers
-        if: matrix.project != 'api'
-        run: npx playwright install --with-deps
-
-      - name: Run tests
-        run: npx playwright test --project=${{ matrix.project }}
-
-      - name: Write job summary
-        if: always()
-        run: |
-          echo "### ${{ matrix.project }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Status: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "Download the playwright-report-${{ matrix.project }} artifact for screenshots and traces." >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Upload report
+      - run: npm ci
+      - run: npx playwright install --with-deps
+      - name: Playwright Test
+        if: matrix.suite == 'playwright'
+        run: npx playwright test
+      - name: Cucumber BDD
+        if: matrix.suite == 'cucumber'
+        run: npm run bdd
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-${{ matrix.project }}
+          name: reports-${{ matrix.suite }}
           path: |
             playwright-report/
-            test-results/junit.xml
+            reports/
           retention-days: 14

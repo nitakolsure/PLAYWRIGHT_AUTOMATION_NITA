@@ -1,66 +1,41 @@
-# Playwright automation
+# Playwright TypeScript + Cucumber BDD
 
-TypeScript Playwright framework for the Playwright docs site, Demoblaze store, and JSONPlaceholder API.
+This repo is **TypeScript only**. Java and Maven were removed.
 
-This repo follows a layered layout (page objects, API clients, fixtures, config, utilities). Java, Cucumber/BDD, and cloud browser grids are out of scope.
+Two runners share the same page objects, API clients, data, and config:
+
+| Runner | Command | What it is |
+|---|---|---|
+| Playwright Test | `npx playwright test` | Specs in `tests/**/*.spec.ts` |
+| Cucumber (TypeScript) | `npm run bdd` | Gherkin in `features/` + steps in `cucumber/` |
 
 ## Folders
 
-| Folder | Role |
+| Path | Role |
 |---|---|
-| `tests/` | Specs only. Tags: `@smoke`, `@regression`, `@e2e`. |
-| `pages/` | Page objects. They extend `core/BasePage`. |
-| `api/` | HTTP clients (`PostsApi`, `UsersApi`). |
-| `fixtures/` | Builds page and API objects for each test. |
-| `data/` | Users, catalog names, order form values. |
-| `config/` | Environment URLs and auth file paths. |
-| `utils/` | Shared helpers (dialogs, Demoblaze API waits). |
-| `core/` | `BasePage` shared by UI pages. |
-| `.github/workflows/` | GitHub Actions (the pipeline that actually runs). |
+| `tests/` | Playwright Test specs |
+| `features/` | Cucumber `.feature` files |
+| `cucumber/support/` | World + hooks (Playwright browser/API) |
+| `cucumber/steps/` | Step definitions that call existing `.ts` pages/API |
+| `pages/`, `api/`, `data/`, `config/`, `utils/`, `core/` | Shared automation layer |
+| `cucumber.ts` | Cucumber runner config (loaded via `cucumber.cjs`) |
 
-`Jenkinsfile` is optional. There is no company Jenkins in this project; use GitHub Actions.
-
-## Setup
+## Commands
 
 ```powershell
 npm install
 npx playwright install
-copy .env.example .env
+npm run bdd:smoke
+npm run bdd
+npx playwright test
 ```
 
-`TEST_ENV` must be `qa` or `stage`. Hosts named `prod` or `production` fail the run. Do not commit `.env`.
-
-## Commands
-
-| Command | What it runs |
+| Script | Runs |
 |---|---|
-| `npm run test:smoke` | Chromium + API tests tagged `@smoke` |
-| `npm run test:ui` | Chromium UI tests |
-| `npm run test:api` | API project |
-| `npm run test:store` | Signed-in Demoblaze order tests |
-| `npm test` | All projects |
-| `npm run typecheck` | TypeScript |
-| `npm run lint` | ESLint |
-| `npm run report` | HTML report |
+| `npm run bdd` | All Cucumber features |
+| `npm run bdd:smoke` | `@smoke` |
+| `npm run bdd:api` | `@api` |
+| `npm run bdd:ui` | `@ui` |
+| `npm test` | Playwright Test (all projects) |
 
-## Projects
-
-- **chromium / firefox / webkit** — UI except checkout.
-- **api** — JSONPlaceholder; no browser.
-- **setup** — signs up a Demoblaze user and saves `storageState`.
-- **store** — order tests using that session.
-
-## Reporting
-
-Failed tests keep a screenshot and a video. A retry keeps a trace. Each run writes:
-
-- `playwright-report/` — HTML
-- `test-results/junit.xml` — JUnit for CI dashboards
-
-## CI
-
-On a **pull request**: typecheck, lint, then `@smoke` (Chromium + API).
-
-On a **push to `main`**: typecheck, lint, then Chromium, Firefox, WebKit, API, and store.
-
-See `CHECKLIST.md` for how this maps to the framework document.
+Cucumber HTML report: `reports/cucumber-report.html`.
